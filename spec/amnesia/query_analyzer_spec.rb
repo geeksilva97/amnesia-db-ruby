@@ -3,8 +3,9 @@
 RSpec.describe Amnesia::QueryAnalyzer do
   let(:instruction) { 'set' }
   let(:key) { 'my:key' }
+  let(:value) { 'value' }
 
-  subject { described_class.call!(instruction, key, 'value') }
+  subject { described_class.call!(instruction, key, value) }
 
   describe '.call!' do
     context 'when a unknown instruction is given' do
@@ -28,6 +29,16 @@ RSpec.describe Amnesia::QueryAnalyzer do
 
       it 'raises an "malformed key" error' do
         expect { subject }.to raise_error(RuntimeError, 'malformed key')
+      end
+    end
+
+    context 'when command is SET' do
+      context 'and a value is not supplied' do
+        let(:value) { nil }
+
+        it 'raises a "set command must contain a key and a value" error' do
+          expect { subject }.to raise_error(RuntimeError, 'set command must contain a key and a value')
+        end
       end
     end
 
