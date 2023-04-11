@@ -36,6 +36,22 @@ module Amnesia
       end
     end
 
+    def parse_record(raw_record)
+      raw_record.split(',', 2)[1]
+    end
+
+    def create_db_file
+      File.write(filename, '') unless file_exists?
+    end
+
+    def file_exists?
+      File.exist?(filename)
+    end
+
+    private
+
+    attr_reader :filename
+
     def record_from_scan(key)
       lines = File.readlines(filename)
 
@@ -54,21 +70,5 @@ module Amnesia
 
       parse_record(record) unless record.nil?
     end
-
-    def parse_record(raw_record)
-      raw_record.split(',', 2)[1]
-    end
-
-    def create_db_file
-      File.write(filename, '') unless file_exists?
-    end
-
-    def file_exists?
-      File.exist?(filename)
-    end
-
-    private
-
-    attr_reader :filename
   end
 end
