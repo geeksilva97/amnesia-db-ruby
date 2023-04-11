@@ -5,11 +5,11 @@ module Amnesia
     end
 
     def set(key, value)
-      File.write(@filename, "#{key},#{value}\n", mode: 'a+')
+      File.write(filename, "#{key},#{value}\n", mode: 'a+')
     end
 
     def get(key)
-      lines = File.readlines(@filename)
+      lines = File.readlines(filename)
 
       result = lines.filter do |line|
         record_key, = line.split(',', 2)
@@ -20,11 +20,15 @@ module Amnesia
     end
 
     def create_db_file
-      File.write(@filename, '') unless file_exists?
+      File.write(filename, '') unless file_exists?
     end
 
     def file_exists?
-      File.exist?(@filename)
+      File.exist?(filename)
     end
+
+    private
+
+    attr_reader :filename
   end
 end
