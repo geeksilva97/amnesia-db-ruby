@@ -60,7 +60,7 @@ module Amnesia
         record_key == key
       end.last
 
-      parse_record(record) unless record.nil?
+      parse_record(record.chomp) unless record.nil?
     end
 
     def record_from_index(index_entry)
