@@ -2,10 +2,16 @@ module Amnesia
   class Storage
     def initialize(filename)
       @filename = filename
+      @index_structure = {}
     end
 
     def set(key, value)
-      File.write(filename, "#{key},#{value}\n", mode: 'a+')
+      offset = File.size(filename)
+      entry = "#{key},#{value}\n"
+
+      @index_structure[key] = [offset, entry.bytesize]
+
+      File.write(filename, entry, mode: 'a+')
     end
 
     def get(key)
