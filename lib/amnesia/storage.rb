@@ -16,7 +16,7 @@ module Amnesia
         record_key == key
       end
 
-      result.last.split(',', 2)[1]
+      result.last.split(',', 2)[1] unless result.empty?
     end
 
     def create_db_file
