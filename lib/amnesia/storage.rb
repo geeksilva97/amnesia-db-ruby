@@ -22,6 +22,20 @@ module Amnesia
       record_from_scan(key)
     end
 
+    def populate_index
+      lines = File.readlines(filename)
+      byte_offset = 0
+
+      lines.each do |line|
+        record_key, = line.split(',', 2)
+        record_size = line.bytesize
+
+        @index_structure[record_key] = [byte_offset, record_size - 1]
+
+        byte_offset += line.bytesize
+      end
+    end
+
     def record_from_scan(key)
       lines = File.readlines(filename)
 
