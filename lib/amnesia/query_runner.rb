@@ -1,5 +1,9 @@
 module Amnesia
   class QueryRunner
+    def initialize(amnesia_storage)
+      @amnesia_storage = amnesia_storage
+    end
+
     def run(instruction_keyword, key, value)
       instruction = instructions_map[instruction_keyword.to_sym]
       instruction.call(key, value)
@@ -15,11 +19,11 @@ module Amnesia
     end
 
     def get(key)
-      "Getting key #{key}"
+      @amnesia_storage.get(key)
     end
 
     def set(key, value)
-      "Setting key #{key} to value #{value}"
+      @amnesia_storage.set(key, value)
     end
   end
 end
