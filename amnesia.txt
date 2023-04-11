@@ -1,7 +1,0 @@
-name,edy
-name,alessandro
-name,lucas
-name,edy
-name,lucas
-name,joe
-name,armstrong
