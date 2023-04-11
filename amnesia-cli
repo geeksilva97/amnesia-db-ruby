@@ -1,2 +1,2 @@
 # /bin/bash
-ruby lib/amnesia.rb $1
+ruby lib/amnesia.rb $1 $2
