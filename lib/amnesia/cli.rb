@@ -10,7 +10,8 @@ module Amnesia
       @amnesia_storage.create_db_file unless @amnesia_storage.file_exists?
     end
 
-    def start
+    def start(populate_index: false)
+      @amnesia_storage.populate_index if populate_index
       query_runner = Amnesia::QueryRunner.new(@amnesia_storage)
       puts "Welcome to AmnesiaDB - Version 0.0.1\n\n"
 
