@@ -21,13 +21,18 @@ module Amnesia
 
         break if raw_command == '.exit'
 
+        start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
         instruction_keyword, key, value = Amnesia::QueryParser.call(raw_command)
 
         next if analysis_failed?(instruction_keyword, key, value)
 
         result = query_runner.run(instruction_keyword, key, value)
 
+        end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
         puts "#{result}\n\n"
+        puts "Executed in #{end_time - start_time} sec"
       end
     end
 

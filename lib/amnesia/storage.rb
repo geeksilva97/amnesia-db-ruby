@@ -4,7 +4,6 @@ module Amnesia
 
     def initialize(filename)
       @filename = filename
-      @index_structure = {}
     end
 
     def size
@@ -12,10 +11,7 @@ module Amnesia
     end
 
     def set(key, value)
-      offset = File.size(filename)
       entry = "#{key},#{value}\n"
-
-      @index_structure[key] = [offset, entry.bytesize - 1]
 
       File.write(filename, entry, mode: 'a+')
     end
