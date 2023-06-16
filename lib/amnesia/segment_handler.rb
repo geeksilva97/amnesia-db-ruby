@@ -16,7 +16,7 @@ module Amnesia
     end
 
     def delete(key)
-      raise 'not implemented yet'
+      @current_segment.remove(key)
     end
 
     def populate_index

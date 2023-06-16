@@ -14,6 +14,11 @@ module Amnesia
       @storage.get(key, index_entry: index_entry)
     end
 
+    def remove(key)
+      @index_structure.remove(key)
+      @storage.delete(key)
+    end
+
     def store(hash_input)
       key, value = hash_input.entries.first
       record = "#{key},#{value}\n"

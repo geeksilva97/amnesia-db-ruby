@@ -16,6 +16,10 @@ module Amnesia
       File.write(filename, entry, mode: 'a+')
     end
 
+    def delete(key)
+      set(key, '')
+    end
+
     def get(key, index_entry: nil)
       return record_from_index(index_entry) unless index_entry.nil?
 
@@ -23,7 +27,15 @@ module Amnesia
     end
 
     def parse_record(raw_record)
-      raw_record.split(',', 2)[1]
+      value = raw_record_value(raw_record)
+
+      return '(nil)' if value.nil? || value.empty?
+
+      value
+    end
+
+    def raw_record_value(raw_record)
+      (raw_record || '').chomp.split(',', 2)[1]
     end
 
     def create_db_file
@@ -44,7 +56,7 @@ module Amnesia
         record_key == key
       end.last
 
-      parse_record(record.chomp) unless record.nil?
+      parse_record(record)
     end
 
     def record_from_index(index_entry)
@@ -52,7 +64,7 @@ module Amnesia
 
       record = File.read(filename, size, offset)
 
-      parse_record(record) unless record.nil?
+      parse_record(record)
     end
   end
 end

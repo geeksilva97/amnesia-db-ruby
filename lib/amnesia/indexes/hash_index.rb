@@ -11,5 +11,9 @@ module Amnesia::Indexes
     def get(index_key)
       @entries[index_key]
     end
+
+    def remove(index_key)
+      @entries.delete(index_key)
+    end
   end
 end
