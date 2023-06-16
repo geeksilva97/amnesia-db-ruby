@@ -4,6 +4,7 @@ require_relative './query_runner'
 require_relative './segment'
 require_relative './segment_handler'
 require_relative './storage'
+require_relative './indexes/hash_index'
 
 module Amnesia
   class CLI

@@ -20,7 +20,7 @@ module Amnesia
     end
 
     def populate_index
-      false
+      @current_segment.populate_index_structure
     end
   end
 end
