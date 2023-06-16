@@ -1,7 +1,11 @@
 # require 'amnesia'
 require 'amnesia/query_analyzer'
 require 'amnesia/query_parser'
+require 'amnesia/query_runner'
 require 'amnesia/storage'
+require 'amnesia/segment_handler'
+require 'amnesia/segment'
+require 'amnesia/cli'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
