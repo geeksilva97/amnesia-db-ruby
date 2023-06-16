@@ -24,6 +24,16 @@ RSpec.describe Amnesia::Storage do
     end
   end
 
+  describe '#delete' do
+    before do
+      subject.delete('key')
+    end
+
+    it 'writes a tombstone entry to the file' do
+      expect(File).to have_received(:write).with('amnesia.db', "key,\n", mode: 'a+')
+    end
+  end
+
   describe '#get' do
     context 'when data is indexed' do
       it 'reads using the given index entry' do
@@ -49,6 +59,28 @@ RSpec.describe Amnesia::Storage do
         expect(subject.get('anykey')).to eq('anyvalue')
         expect(File).to have_received(:readlines)
         expect(File).not_to have_received(:read)
+      end
+    end
+
+    context 'when returned data is a tombstone' do
+      it 'returns (nil)' do
+        allow(File).to receive(:readlines)
+          .and_return(['tombstone,'])
+
+        result = subject.get('tombstone')
+
+        expect(result).to eq('(nil)')
+      end
+    end
+
+    context 'when the searched key does not exist' do
+      it 'returns (nil)' do
+        allow(File).to receive(:readlines)
+          .and_return(['tombostone,'])
+
+        result = subject.get('hello')
+
+        expect(result).to eq('(nil)')
       end
     end
   end
