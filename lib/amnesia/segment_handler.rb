@@ -1,7 +1,10 @@
+
 module Amnesia
   class SegmentHandler
     def initialize(filename)
       @current_segment = Amnesia::Segment.new(filename)
+      # TODO: add @segments list to hold existing segments
+      # TODO: add compact method
     end
 
     def store(hash_input)
@@ -14,6 +17,10 @@ module Amnesia
 
     def delete(key)
       raise 'not implemented yet'
+    end
+
+    def populate_index
+      false
     end
   end
 end
