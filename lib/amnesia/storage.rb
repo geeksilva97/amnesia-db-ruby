@@ -1,39 +1,25 @@
 module Amnesia
   class Storage
+    attr_reader :filename
+
     def initialize(filename)
       @filename = filename
-      @index_structure = {}
+    end
+
+    def size
+      File.size(filename)
     end
 
     def set(key, value)
-      offset = File.size(filename)
       entry = "#{key},#{value}\n"
-
-      @index_structure[key] = [offset, entry.bytesize - 1]
 
       File.write(filename, entry, mode: 'a+')
     end
 
-    def get(key)
-      index_entry = @index_structure[key]
-
+    def get(key, index_entry: nil)
       return record_from_index(index_entry) unless index_entry.nil?
 
       record_from_scan(key)
-    end
-
-    def populate_index
-      lines = File.readlines(filename)
-      byte_offset = 0
-
-      lines.each do |line|
-        record_key, = line.split(',', 2)
-        record_size = line.bytesize
-
-        @index_structure[record_key] = [byte_offset, record_size - 1]
-
-        byte_offset += line.bytesize
-      end
     end
 
     def parse_record(raw_record)
@@ -49,8 +35,6 @@ module Amnesia
     end
 
     private
-
-    attr_reader :filename
 
     def record_from_scan(key)
       lines = File.readlines(filename)

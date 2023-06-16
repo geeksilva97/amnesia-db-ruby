@@ -1,7 +1,7 @@
 module Amnesia
   class QueryRunner
-    def initialize(amnesia_storage)
-      @amnesia_storage = amnesia_storage
+    def initialize(segment_handler)
+      @segment_handler = segment_handler
     end
 
     def run(instruction_keyword, key, value)
@@ -14,16 +14,21 @@ module Amnesia
     def instructions_map
       {
         "set": proc { |key, value| set(key, value) },
-        "get": proc { |key| get(key) }
+        "get": proc { |key| get(key) },
+        "delete": proc { |key| delete(key) }
       }
     end
 
     def get(key)
-      @amnesia_storage.get(key)
+      @segment_handler.retrieve(key)
     end
 
     def set(key, value)
-      @amnesia_storage.set(key, value)
+      @segment_handler.store(Hash[key, value])
+    end
+
+    def delete(key)
+      @segment_handler.delete(key)
     end
   end
 end
