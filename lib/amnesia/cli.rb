@@ -5,14 +5,12 @@ require_relative './storage'
 
 module Amnesia
   class CLI
-    def initialize(filename)
-      @amnesia_storage = Amnesia::Storage.new(filename)
-      @amnesia_storage.create_db_file unless @amnesia_storage.file_exists?
+    def initialize(filename, populate_index: nil)
+      @segment_handler = Amnesia::SegmentHandler.new(filename)
+      @segment_handler.populate_index if populate_index
     end
 
-    def start(populate_index: false)
-      @amnesia_storage.populate_index if populate_index
-      query_runner = Amnesia::QueryRunner.new(@amnesia_storage)
+    def start
       puts "Welcome to AmnesiaDB - Version 0.1.0\n\n"
 
       loop do
@@ -31,6 +29,10 @@ module Amnesia
     end
 
     private
+
+    def query_runner
+      @query_runner ||= Amnesia::QueryRunner.new(@segment_handler)
+    end
 
     def read_user_input
       print '> '
