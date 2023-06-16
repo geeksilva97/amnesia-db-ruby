@@ -1,7 +1,7 @@
 # AmnesiaDB
 
 AmnesiaDB is a simple key/value storage engine developed with a single purpose: studying internal aspects of a database.
-It's supposed to be an LSM-Tree with some specific structures being implemented using B+-Trees.
+It's supposed to be an LSM-Tree with some specific types being implemented using B+-Trees.
 
 
 ## Features
@@ -9,7 +9,7 @@ It's supposed to be an LSM-Tree with some specific structures being implemented 
 ### Data Structures/Types
 
 - SET: Implemented using B+-Trees
-- STRING: Plain values stores by commands like `set somekey somevalue`
+- STRING: Plain values stored by commands like `set somekey somevalue`
 
 ## Executing this project
 
@@ -49,5 +49,5 @@ for retrieving:
 
 ```bash
 > get lastName
-Mabel
+Pines
 ```
