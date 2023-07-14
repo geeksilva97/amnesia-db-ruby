@@ -19,25 +19,33 @@ RSpec.describe Amnesia::Storage do
       subject.set('key', 'value')
     end
 
-    it 'checks file size to calculate the offset' do
-      expect(File).to have_received(:size).with('amnesia.db')
-    end
-
     it 'writes key,value to the file' do
       expect(File).to have_received(:write).with('amnesia.db', "key,value\n", mode: 'a+')
     end
   end
 
+  describe '#delete' do
+    before do
+      subject.delete('key')
+    end
+
+    it 'writes a tombstone entry to the file' do
+      expect(File).to have_received(:write).with('amnesia.db', "key,\n", mode: 'a+')
+    end
+  end
+
   describe '#get' do
     context 'when data is indexed' do
-      it 'reads from index' do
+      it 'reads using the given index entry' do
         allow(File).to receive(:read)
           .with('amnesia.db', 17, 0)
           .and_return('somekey,somevalue')
 
         subject.set('somekey', 'somevalue')
 
-        expect(subject.get('somekey')).to eq('somevalue')
+        result = subject.get('somekey', index_entry: [0, 17])
+
+        expect(result).to eq('somevalue')
         expect(File).not_to have_received(:readlines)
         expect(File).to have_received(:read)
       end
@@ -53,18 +61,27 @@ RSpec.describe Amnesia::Storage do
         expect(File).not_to have_received(:read)
       end
     end
-  end
 
-  describe '#populate_index' do
-    before do
-      allow(File).to receive(:readlines)
-        .and_return((1..2).map { |i| "key#{i},value#{i}" }.to_a)
+    context 'when returned data is a tombstone' do
+      it 'returns (nil)' do
+        allow(File).to receive(:readlines)
+          .and_return(['tombstone,'])
 
-      subject.populate_index
+        result = subject.get('tombstone')
+
+        expect(result).to eq('(nil)')
+      end
     end
 
-    it 'builds structcure from database file' do
-      expect(File).to have_received(:readlines).with('amnesia.db')
+    context 'when the searched key does not exist' do
+      it 'returns (nil)' do
+        allow(File).to receive(:readlines)
+          .and_return(['tombostone,'])
+
+        result = subject.get('hello')
+
+        expect(result).to eq('(nil)')
+      end
     end
   end
 end
