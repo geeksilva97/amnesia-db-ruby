@@ -15,8 +15,9 @@ module Amnesia
     end
 
     def remove(key)
-      @index_structure.remove(key)
-      @storage.delete(key)
+      offset = @storage.delete(key)
+      @index_structure.add(key, [@storage.size, @storage.size + offset - 1])
+      1
     end
 
     def store(hash_input)
