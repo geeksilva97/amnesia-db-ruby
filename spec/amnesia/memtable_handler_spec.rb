@@ -9,11 +9,14 @@ RSpec.describe Amnesia::MemtableHandler do
       it 'reads data by looking at all the existing memtables' do
         allow(segment_handler).to receive(:retrieve)
 
-        subject.write('some_key', 'some_value')
+        subject.write('k1', 'some_value')
+        subject.write('k2', 'some_value')
+        subject.write('k3', 'some_value')
+        subject.write('k5', 'some_value')
 
-        res = subject.read('some_key')
+        res = subject.read('k5')
 
-        expect(res).to eq('some_key,some_value')
+        expect(res).to eq('k5,some_value')
         expect(segment_handler).to_not have_received(:retrieve)
       end
     end
