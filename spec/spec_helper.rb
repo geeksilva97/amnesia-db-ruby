@@ -6,6 +6,7 @@ require 'amnesia/storage'
 require 'amnesia/segment_handler'
 require 'amnesia/segment'
 require 'amnesia/cli'
+require 'amnesia/support/avl'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
