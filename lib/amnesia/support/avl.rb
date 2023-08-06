@@ -1,13 +1,15 @@
 module Amnesia::Support
   class AVL
-    attr_reader :root
+    attr_reader :root, :size
 
     def initialize
       @root = nil
+      @size = 0
     end
 
     def insert(key, value = nil)
       @root = insert_node(@root, key, value)
+      @size += 1
     end
 
     def traverse(&block)
@@ -46,6 +48,8 @@ module Amnesia::Support
       return if node.nil?
 
       node.value = value
+
+      @size -= 1
 
       node
     end

@@ -2,6 +2,13 @@ RSpec.describe Amnesia::Support::AVL do
   subject { described_class.new }
 
   describe '#insert' do
+    it 'increments the size' do
+      subject.insert(10)
+      subject.insert(11)
+
+      expect(subject.size).to eq(2)
+    end
+
     context 'when the tree is empty' do
       it 'add the node as the root of the tree' do
         subject.insert(10)
@@ -69,6 +76,14 @@ RSpec.describe Amnesia::Support::AVL do
         expect(subject.root.key).to eq(11)
         expect(subject.root.right.key).to eq(12)
         expect(subject.root.right.value).to eq('d')
+      end
+
+      it 'does not increment the size' do
+        subject.insert(10, 'a')
+        subject.insert(10, 'b')
+        subject.insert(10, 'c')
+
+        expect(subject.size).to eq(1)
       end
     end
   end
