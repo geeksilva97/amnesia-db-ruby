@@ -49,6 +49,16 @@ RSpec.describe Amnesia::MemtableHandler do
     end
   end
 
+  describe '#delete' do
+    it 'writes a tombostone' do
+      allow(subject).to receive(:write)
+
+      subject.delete('key5')
+
+      expect(subject).to have_received(:write).with('key5', '')
+    end
+  end
+
   describe '#flush' do
     it 'flushes to the segment' do
       allow(segment_handler).to receive(:retrieve)

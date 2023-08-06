@@ -16,6 +16,10 @@ module Amnesia
       @segment_handler.retrieve(key)
     end
 
+    def delete(key)
+      write(key, '')
+    end
+
     def write(key, value)
       available_memtable = @memtables.detect { |memtable| memtable.status == :active }
 
