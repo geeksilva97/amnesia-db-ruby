@@ -56,7 +56,7 @@ RSpec.describe Amnesia::Support::AVL do
   end
 
   describe '#traverse' do
-    it 'executer the given block for each node' do
+    it 'executes the given block for each node' do
       subject.insert(10, 'abc')
       subject.insert(11, 'def')
       subject.insert(12, 'ghi')
@@ -65,6 +65,28 @@ RSpec.describe Amnesia::Support::AVL do
         subject.traverse(&block)
       end.to yield_successive_args({ key: 10, value: 'abc' }, { key: 11, value: 'def' },
                                    { key: 12, value: 'ghi' })
+    end
+  end
+
+  describe '#find' do
+    context 'when the key exists in the tree' do
+      it 'returns the found node' do
+        subject.insert(10, 'abc')
+
+        found = subject.find(10)
+
+        expect(found.key).to eq(10)
+      end
+    end
+
+    context 'when the key does not exist in the tree' do
+      it 'returns nil' do
+        subject.insert(10, 'abc')
+
+        found = subject.find(1)
+
+        expect(found).to be_nil
+      end
     end
   end
 end

@@ -14,7 +14,19 @@ module Amnesia::Support
       traverse_node(@root, block)
     end
 
+    def find(key)
+      find_node(@root, key)
+    end
+
     private
+
+    def find_node(node, key)
+      return node if node.nil? || node.key == key
+
+      return find_node(node.left, key) if key < node.key
+
+      return find_node(node.right, key) if key >= node.key
+    end
 
     def traverse_node(node, block)
       return :noop if node.nil?
