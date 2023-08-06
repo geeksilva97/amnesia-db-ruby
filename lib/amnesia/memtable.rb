@@ -22,7 +22,12 @@ module Amnesia
     def flush(segment_handler)
       # TODO: Write a whole block instead of each node be a write
       @status = :flushing
-      @store.traverse { |node| segment_handler.store({ key: node[:key], value: node[:value] }) }
+      @store.traverse do |node|
+        key = node[:key]
+        value = node[:value]
+
+        segment_handler.store(Hash[key, value])
+      end
       @status = :finished_flusing
     end
   end

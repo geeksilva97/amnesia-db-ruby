@@ -11,7 +11,7 @@ module Amnesia
 
       result = memtable.read(key) unless memtable.nil?
 
-      return "#{result.key},#{result.value}" unless result.nil?
+      return result.value unless result.nil?
 
       @segment_handler.retrieve(key)
     end
@@ -33,6 +33,8 @@ module Amnesia
       @memtables.push(Amnesia::Memtable.new)
       current_memtable.flush(@segment_handler)
       @memtables.shift
+
+      'flushed table'
     end
 
     private
