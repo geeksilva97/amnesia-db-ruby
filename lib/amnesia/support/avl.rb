@@ -1,13 +1,9 @@
 module Amnesia::Support
   class AVL
+    attr_reader :root
+
     def initialize
       @root = nil
-    end
-
-    def height(node)
-      return -1 if node.nil?
-
-      node.height
     end
 
     def insert(key, value = nil)
@@ -15,6 +11,12 @@ module Amnesia::Support
     end
 
     private
+
+    def height(node)
+      return -1 if node.nil?
+
+      node.height
+    end
 
     def insert_node(root, key, value)
       return Node.new(key, value) if root.nil?
@@ -75,8 +77,9 @@ module Amnesia::Support
     end
   end
 
+  # TODO: This can be a simple Struct
   class Node
-    attr_accessor :key, :value, :left, :right
+    attr_accessor :key, :value, :left, :right, :height
 
     def initialize(key, value = nil, left = nil, right = nil)
       @key = key
