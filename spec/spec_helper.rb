@@ -7,6 +7,7 @@ require 'amnesia/segment_handler'
 require 'amnesia/segment'
 require 'amnesia/cli'
 require 'amnesia/support/avl'
+require 'amnesia/memtable_handler'
 require 'amnesia/memtable'
 
 RSpec.configure do |config|

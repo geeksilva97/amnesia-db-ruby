@@ -1,22 +1,34 @@
 module Amnesia
   class MemtableHandler
-    def initialize(segment_handler)
+    def initialize(segment_handler, max_items_threshold = 5)
+      @max_items_threshold = max_items_threshold
       @segment_handler = segment_handler
-      @memtables = [Amnesia::Memtable.new]
+      @memtables = [Amnesia::Memtable.new] # maybe it can be a linked list
     end
 
     def read(key)
-      memtable.read(key)
+      memtable = @memtables.reverse_each.detect { |table| table.read(key) }
+
+      result = memtable.read(key) unless memtable.nil?
+
+      return "#{result.key},#{result.value}" unless result.nil?
+
+      @segment_handler.retrieve(key)
     end
 
     def write(key, value)
-      memtable.write(key, value)
+      available_memtable = @memtables.detect { |memtable| memtable.status == :active }
+
+      available_memtable.write(key, value)
+
+      flush if available_memtable.size >= @max_items_threshold
     end
 
     def flush
-      memtable.status = :flushing
-      memtable.flush(segment_handler)
-      memtable.status = :finished_flusing
+      current_memtable = memtable
+      @memtables.push(Amnesia::Memtable.new)
+      current_memtable.flush(@segment_handler)
+      @memtables.shift
     end
 
     private

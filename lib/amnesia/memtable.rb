@@ -7,6 +7,10 @@ module Amnesia
       @status = :active
     end
 
+    def size
+      @store.size
+    end
+
     def read(key)
       @store.find(key)
     end
