@@ -53,6 +53,24 @@ RSpec.describe Amnesia::Support::AVL do
         end
       end
     end
+
+    context 'when the inserted key already exists in the tree' do
+      it 'updates the node value' do
+        subject.insert(10, 'a')
+        subject.insert(11, 'b')
+        subject.insert(12, 'c')
+
+        expect(subject.root.key).to eq(11)
+        expect(subject.root.right.key).to eq(12)
+        expect(subject.root.right.value).to eq('c')
+
+        subject.insert(12, 'd')
+
+        expect(subject.root.key).to eq(11)
+        expect(subject.root.right.key).to eq(12)
+        expect(subject.root.right.value).to eq('d')
+      end
+    end
   end
 
   describe '#traverse' do

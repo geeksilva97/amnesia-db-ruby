@@ -42,8 +42,18 @@ module Amnesia::Support
       node.height
     end
 
+    def update_node_value(node, value)
+      return if node.nil?
+
+      node.value = value
+
+      node
+    end
+
     def insert_node(root, key, value)
       return Node.new(key, value) if root.nil?
+
+      return update_node_value(root, value) if key == root.key
 
       if key < root.key
         root.left = insert_node(root.left, key, value)
