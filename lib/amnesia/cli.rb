@@ -11,6 +11,7 @@ module Amnesia
     def initialize(filename, populate_index: nil)
       @segment_handler = Amnesia::SegmentHandler.new(filename)
       @segment_handler.populate_index if populate_index
+      @memtable_handler = Amnesia::MemtableHandler.new(@segment_handler)
     end
 
     def start
@@ -39,7 +40,7 @@ module Amnesia
     private
 
     def query_runner
-      @query_runner ||= Amnesia::QueryRunner.new(@segment_handler)
+      @query_runner ||= Amnesia::QueryRunner.new(@memtable_handler)
     end
 
     def read_user_input
