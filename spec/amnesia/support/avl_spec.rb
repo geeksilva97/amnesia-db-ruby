@@ -54,4 +54,17 @@ RSpec.describe Amnesia::Support::AVL do
       end
     end
   end
+
+  describe '#traverse' do
+    it 'executer the given block for each node' do
+      subject.insert(10, 'abc')
+      subject.insert(11, 'def')
+      subject.insert(12, 'ghi')
+
+      expect do |block|
+        subject.traverse(&block)
+      end.to yield_successive_args({ key: 10, value: 'abc' }, { key: 11, value: 'def' },
+                                   { key: 12, value: 'ghi' })
+    end
+  end
 end

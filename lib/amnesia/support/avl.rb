@@ -10,7 +10,19 @@ module Amnesia::Support
       @root = insert_node(@root, key, value)
     end
 
+    def traverse(&block)
+      traverse_node(@root, block)
+    end
+
     private
+
+    def traverse_node(node, block)
+      return :noop if node.nil?
+
+      traverse_node(node.left, block)
+      block.call({ key: node.key, value: node.value })
+      traverse_node(node.right, block)
+    end
 
     def height(node)
       return -1 if node.nil?
