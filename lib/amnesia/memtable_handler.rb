@@ -1,6 +1,6 @@
 module Amnesia
   class MemtableHandler
-    def initialize(segment_handler, max_items_threshold = 5)
+    def initialize(segment_handler, max_items_threshold = 3)
       @segment_handler = segment_handler
       @max_items_threshold = max_items_threshold
 
@@ -8,7 +8,15 @@ module Amnesia
       @memtables = [Amnesia::Memtable.new]
     end
 
-    def read(key); end
+    def read(key)
+      record = find_key_in_memtables(key)
+
+      # se estiver na memtable já retorna
+      return record.value unless record.nil?
+
+      # Busca no disco
+      @segment_handler.retrieve(key)
+    end
 
     def write(key, value)
       available_memtable = @memtables.detect { |memtable| memtable.status == :active }
@@ -24,14 +32,26 @@ module Amnesia
 
     private
 
+    def find_key_in_memtables(key)
+      @memtables.each do |table|
+        result = table.read(key)
+
+        return result unless result.nil?
+      end
+
+      nil
+    end
+
     def flush
       current_memtable = memtable
 
-      @memtables.push(Amnesia::Memtable.new)
+      @memtables.unshift(Amnesia::Memtable.new)
 
       current_memtable.flush(@segment_handler)
 
-      @memtables.shift
+      @memtables.pop
+
+      'flushed'
     end
 
     def memtable

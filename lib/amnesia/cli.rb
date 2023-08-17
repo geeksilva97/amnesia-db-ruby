@@ -3,6 +3,9 @@ require_relative './query_analyzer'
 require_relative './query_runner'
 require_relative './segment'
 require_relative './segment_handler'
+require_relative './support/avl'
+require_relative './memtable'
+require_relative './memtable_handler'
 require_relative './storage'
 require_relative './indexes/hash_index'
 
@@ -11,6 +14,8 @@ module Amnesia
     def initialize(filename, populate_index: nil)
       @segment_handler = Amnesia::SegmentHandler.new(filename)
       @segment_handler.populate_index if populate_index
+
+      @memtable_handler = Amnesia::MemtableHandler.new(@segment_handler)
     end
 
     def start
@@ -39,7 +44,7 @@ module Amnesia
     private
 
     def query_runner
-      @query_runner ||= Amnesia::QueryRunner.new(@segment_handler)
+      @query_runner ||= Amnesia::QueryRunner.new(@memtable_handler)
     end
 
     def read_user_input

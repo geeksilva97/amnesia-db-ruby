@@ -20,6 +20,10 @@ module Amnesia::Support
       find_node(@root, key)
     end
 
+    def size
+      @size
+    end
+
     private
 
     def find_node(node, key)

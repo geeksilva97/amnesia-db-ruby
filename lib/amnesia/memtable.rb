@@ -2,7 +2,7 @@ module Amnesia
   class Memtable
     attr_accessor :status
 
-    def initialize(store = Amnesia::Support::AVL)
+    def initialize(store = Amnesia::Support::AVL.new)
       @store = store
       @status = :active # active, flushing, finished_flushing
     end
