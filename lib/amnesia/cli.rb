@@ -11,11 +11,11 @@ require_relative './indexes/hash_index'
 
 module Amnesia
   class CLI
-    def initialize(filename, populate_index: nil)
-      @segment_handler = Amnesia::SegmentHandler.new(filename)
-      @segment_handler.populate_index if populate_index
+    def initialize(segment_files, populate_index: nil)
+      segment_handler.load_segments(segment_files)
+      segment_handler.populate_index if populate_index
 
-      @memtable_handler = Amnesia::MemtableHandler.new(@segment_handler)
+      @memtable_handler = Amnesia::MemtableHandler.new(segment_handler)
     end
 
     def start
@@ -42,6 +42,10 @@ module Amnesia
     end
 
     private
+
+    def segment_handler
+      @segment_handler ||= Amnesia::SegmentHandler.new
+    end
 
     def query_runner
       @query_runner ||= Amnesia::QueryRunner.new(@memtable_handler)

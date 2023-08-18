@@ -14,9 +14,13 @@ module Amnesia
       @storage.get(key, index_entry: index_entry)
     end
 
+    def size
+      @storage.size
+    end
+
     def remove(key)
       offset = @storage.delete(key)
-      @index_structure.add(key, [@storage.size, @storage.size + offset - 1])
+      @index_structure.add(key, [size, size + offset - 1])
       1
     end
 
