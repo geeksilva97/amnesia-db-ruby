@@ -4,10 +4,12 @@ module Amnesia::Support
 
     def initialize
       @root = nil
+      @size = 0
     end
 
     def insert(key, value = nil)
       @root = insert_node(@root, key, value)
+      @size += 1
     end
 
     def traverse(&block)
@@ -16,6 +18,10 @@ module Amnesia::Support
 
     def find(key)
       find_node(@root, key)
+    end
+
+    def size
+      @size
     end
 
     private
@@ -32,7 +38,9 @@ module Amnesia::Support
       return :noop if node.nil?
 
       traverse_node(node.left, block)
+
       block.call({ key: node.key, value: node.value })
+
       traverse_node(node.right, block)
     end
 
@@ -46,6 +54,8 @@ module Amnesia::Support
       return if node.nil?
 
       node.value = value
+
+      @size -= 1
 
       node
     end

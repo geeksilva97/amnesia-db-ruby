@@ -1,7 +1,7 @@
 module Amnesia
   class QueryRunner
-    def initialize(segment_handler)
-      @segment_handler = segment_handler
+    def initialize(memtable_handler)
+      @memtable_handler = memtable_handler
     end
 
     def run(instruction_keyword, key, value)
@@ -20,15 +20,15 @@ module Amnesia
     end
 
     def get(key)
-      @segment_handler.retrieve(key)
+      @memtable_handler.read(key)
     end
 
     def set(key, value)
-      @segment_handler.store(Hash[key, value])
+      @memtable_handler.write(key, value)
     end
 
     def delete(key)
-      @segment_handler.delete(key)
+      @memtable_handler.delete(key)
     end
   end
 end
