@@ -23,13 +23,16 @@ module Amnesia
 
     def flush(segment_handler)
       @status = :flushing
+      items = []
 
       @store.traverse do |node|
         key = node[:key]
         value = node[:value]
 
-        segment_handler.store(Hash[key, value])
+        items << [key, value]
       end
+
+      segment_handler.flush(items)
 
       @status = :finished_flushing
     end

@@ -2,13 +2,27 @@ module Amnesia
   class SegmentHandler
     def initialize
       @segments = []
-      @size_threshold_in_bytes = 50
+      @size_threshold_in_bytes = 40
     end
 
     def current_segment
       start_segment if @segments.empty?
 
       @segments.first
+    end
+
+    def flush(items)
+      # TODO: Use the storage class for that
+
+      filename = "./_data/#{Time.now.to_i}.segment"
+
+      File.open(filename, 'w') do |f|
+        items.each { |(key, value)| f.write("#{key},#{value}\n") }
+      end
+
+      @segments << Amnesia::Segment.new(filename)
+
+      :finished_flushing
     end
 
     def store(hash_input)
@@ -32,7 +46,7 @@ module Amnesia
       pp filenames
 
       filenames.each do |filename|
-        @segments << Amnesia::Segment.new(filename)
+        @segments.unshift(Amnesia::Segment.new(filename))
       end
     end
 
