@@ -6,14 +6,11 @@ module Amnesia
     end
 
     def current_segment
-      start_segment if @segments.empty?
-
       @segments.first
     end
 
     def flush(items)
       # TODO: Use the storage class for that
-
       filename = "./_data/#{Time.now.to_i}.segment"
 
       File.open(filename, 'w') do |f|
@@ -25,20 +22,30 @@ module Amnesia
       :finished_flushing
     end
 
+    # TODO: remove this method
     def store(hash_input)
       current_segment.store(hash_input)
     end
 
     def retrieve(key)
-      current_segment.retrieve(key)
+      @segments.each do |segment|
+        puts "looking into segment #{segment.name}"
+
+        result = segment.retrieve(key)
+
+        return result unless result.nil?
+      end
+
+      nil
     end
 
+    # TODO: remove this method
     def delete(key)
       current_segment.remove(key)
     end
 
     def populate_index
-      current_segment.populate_index_structure
+      current_segment&.populate_index_structure
     end
 
     def load_segments(filenames)
