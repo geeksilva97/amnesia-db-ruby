@@ -36,7 +36,7 @@ module Amnesia
 
         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-        puts "#{result}\n\n"
+        puts "#{result || '(nil)'}\n\n"
         puts "Executed in #{end_time - start_time} sec"
       end
     end

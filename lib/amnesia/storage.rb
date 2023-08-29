@@ -29,7 +29,7 @@ module Amnesia
     def parse_record(raw_record)
       value = raw_record_value(raw_record)
 
-      return '(nil)' if value.nil? || value.empty?
+      return nil if value.nil? || value.empty?
 
       value
     end
