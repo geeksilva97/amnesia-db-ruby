@@ -57,6 +57,12 @@ module Amnesia
       end
     end
 
+    def refresh_segments(filenames)
+      @segments = []
+
+      load_segments(filenames)
+    end
+
     private
 
     def start_segment

@@ -2,8 +2,9 @@ module Amnesia
   class Storage
     attr_reader :filename
 
-    def initialize(filename)
+    def initialize(filename, items: nil)
       @filename = filename
+      populate_data(items) unless items.nil? || items.empty?
     end
 
     def size
@@ -24,6 +25,14 @@ module Amnesia
       return record_from_index(index_entry) unless index_entry.nil?
 
       record_from_scan(key)
+    end
+
+    def all
+      File.readlines(filename).map do |record|
+        key, value = record.chomp.split(',')
+
+        [key, value]
+      end
     end
 
     def parse_record(raw_record)
@@ -47,6 +56,14 @@ module Amnesia
     end
 
     private
+
+    def populate_data(items)
+      File.open(filename, 'w') do |f|
+        items.each do |(key, value)|
+          f.write("#{key},#{value}\n")
+        end
+      end
+    end
 
     def record_from_scan(key)
       lines = File.readlines(filename)
