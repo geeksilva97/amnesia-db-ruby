@@ -3,9 +3,14 @@ module Amnesia
     attr_reader :index_structure
 
     def initialize(filename, index_structure: Amnesia::Indexes::HashIndex.new)
+      @filename = filename
       @storage = Amnesia::Storage.new(filename)
       @storage.create_db_file unless @storage.file_exists?
       @index_structure = index_structure
+    end
+
+    def name
+      @filename
     end
 
     def retrieve(key)
@@ -14,9 +19,13 @@ module Amnesia
       @storage.get(key, index_entry: index_entry)
     end
 
+    def size
+      @storage.size
+    end
+
     def remove(key)
       offset = @storage.delete(key)
-      @index_structure.add(key, [@storage.size, @storage.size + offset - 1])
+      @index_structure.add(key, [size, size + offset - 1])
       1
     end
 
