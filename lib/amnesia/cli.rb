@@ -19,6 +19,8 @@ module Amnesia
     end
 
     def start
+      segment_handler.compact
+
       puts "Welcome to AmnesiaDB - Version 0.1.0\n\n"
 
       loop do

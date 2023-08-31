@@ -1,18 +1,9 @@
 module Amnesia
   class Compactor
-    # TODO: Mover para a classe de storage
-    def self.all(filename)
-      File.readlines(filename).map do |record|
-        key, value = record.chomp.split(',')
-
-        [key, value]
-      end
-    end
-
-    def self.call(sstable_path1, sstable_path2)
+    def self.call(sstable1, sstable2)
       # todos itens de sstable1 e sstable2
-      sstable_items1 = all(sstable_path1) # [[], [], \n]
-      sstable_items2 = all(sstable_path2)
+      sstable_items1 = sstable1.all
+      sstable_items2 = sstable2.all
 
       pp sstable_items1
       pp sstable_items2
@@ -35,7 +26,7 @@ module Amnesia
         key1 = item1[0] unless item1.nil?
         key2 = item2[0] unless item2.nil?
 
-        min_key = [key1, key2].min
+        min_key = [key1, key2].compact.min
 
         if key1 == key2
           p1 += 1
@@ -58,6 +49,8 @@ module Amnesia
       end
 
       pp result
+
+      result
     end
   end
 end

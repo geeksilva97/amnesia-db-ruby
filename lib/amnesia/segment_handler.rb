@@ -9,6 +9,28 @@ module Amnesia
       @segments.first
     end
 
+    def segments
+      @segments ||= []
+    end
+
+    def compact
+      segments_to_compact = segments[-2..]
+
+      return if segments_to_compact.nil?
+
+      pp segments_to_compact
+
+      filename = "./_data/#{Time.now.to_i}.c.segment"
+
+      compaction_result = Amnesia::Compactor.call(*segments_to_compact)
+
+      new_segment = Amnesia::Segment.new(filename, items: compaction_result)
+
+      @segments.unshift(new_segment)
+
+      segments.pop(2).each(&:destroy)
+    end
+
     def flush(items)
       # TODO: Use the storage class for that
       filename = "./_data/#{Time.now.to_i}.segment"
@@ -17,7 +39,9 @@ module Amnesia
         items.each { |(key, value)| f.write("#{key},#{value}\n") }
       end
 
-      @segments << Amnesia::Segment.new(filename)
+      @segments.unshift(Amnesia::Segment.new(filename))
+
+      compact if @segments.length == 2
 
       :finished_flushing
     end
