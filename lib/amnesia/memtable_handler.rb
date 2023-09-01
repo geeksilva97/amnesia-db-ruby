@@ -1,6 +1,6 @@
 module Amnesia
   class MemtableHandler
-    def initialize(segment_handler, max_items_threshold = 2)
+    def initialize(segment_handler, max_items_threshold = 1)
       @segment_handler = segment_handler
       @max_items_threshold = max_items_threshold
 

@@ -9,7 +9,7 @@ SStable file
 ----------------------
 HEADER
 ----------------------
-# of keys (int32) | created_at (int32) | size of data blocks (i32) [3 bytes]
+# of keys (uint8) | created_at (uint64) | size of data blocks (i32) [13 bytes]
 
 ............................................................
 
@@ -25,6 +25,5 @@ sizeof(k3) | k3 | offset of k3
 ----------------------
 DATA BLOCK
 ----------------------
-is_tombstone | created_at | sizeof(v1) | v1 | sizeof(k1) |  k1
-is_tombstone | created_at | sizeof(v2) | v2 | sizeof(k2) |  k2
-is_tombstone | created_at | sizeof(v3) | v3 | sizeof(k3) |  k3
+7-bit         1-bit         64-bit        8-bit       x bytes 8-bit      y bytes
+record_size | is_tombstone | created_at | sizeof(v1) | v1 | sizeof(k1) |  k1

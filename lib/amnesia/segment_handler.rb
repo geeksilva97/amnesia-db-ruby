@@ -32,18 +32,20 @@ module Amnesia
     end
 
     def flush(items)
+      create_segment("./_data/#{Time.now.to_i}.segment", items)
+      pp 'flushed'
       # TODO: Use the storage class for that
-      filename = "./_data/#{Time.now.to_i}.segment"
+      # filename = "./_data/#{Time.now.to_i}.segment"
 
-      File.open(filename, 'w') do |f|
-        items.each { |(key, value)| f.write("#{key},#{value}\n") }
-      end
+      # File.open(filename, 'w') do |f|
+      #   items.each { |(key, value)| f.write("#{key},#{value}\n") }
+      # end
 
-      @segments.unshift(Amnesia::Segment.new(filename))
+      # @segments.unshift(Amnesia::Segment.new(filename))
 
-      compact if @segments.length == 2
+      # compact if @segments.length == 2
 
-      :finished_flushing
+      # :finished_flushing
     end
 
     # TODO: remove this method
@@ -82,6 +84,10 @@ module Amnesia
     end
 
     private
+
+    def create_segment(filename, items)
+      @segments.unshift(Amnesia::Segment.new(filename, items: items))
+    end
 
     def start_segment
       filename = "./_data/#{Time.now.to_i}.segment"

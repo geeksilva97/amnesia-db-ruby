@@ -54,9 +54,38 @@ module Amnesia
     private
 
     def populate_data(items)
-      data_block = items.map { |(key, value)| "#{key},#{value}\n" }.join('')
+      num_keys = items.length
+      created_at_timestamp = Time.now.to_i
+      size_of_blocks = 100
+      # data_block = items.map { |(key, value)| "#{key},#{value}\n" }.join('')
 
-      create_db_file(data_block)
+      header = [num_keys, created_at_timestamp, size_of_blocks].pack('CQL')
+
+      data_blocks = items.map do |(key, value)|
+        is_tombstone = value.empty? ? 1 : 0
+
+        record = [key.bytesize, key, value.bytesize, value].pack("Ca#{key.bytesize}Ca*")
+
+        # we will use 7 bits for record size and 1 bit for tombostone flag
+        # por isso o shift
+        # isso nos limita a um registro de no maximo 127bytes, mas parece bom pra gente
+        record_size = (record.bytesize << 1) | is_tombstone
+
+        record_metadata = [record_size, created_at_timestamp].pack('CQ')
+
+        "#{record_metadata}#{record}"
+
+        # [is_tombstone, created_at_timestamp, key.bytesize, key, value.bytesize,
+        #  value].pack("CQCa#{key.bytesize}Ca*")
+      end.join
+
+      content = "#{header}#{data_blocks}"
+
+      puts "Stored #{content.bytesize} in the file #{filename}\n\nheader -> #{header.bytesize}b\nblocks -> #{data_blocks.bytesize}"
+
+      File.binwrite(filename, content)
+
+      # create_db_file(data_block)
     end
 
     def record_from_scan(key)
