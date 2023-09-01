@@ -9,25 +9,16 @@ seek = 0
 # with slice we can skip bytes
 
 0.upto(num_keys - 1) do |index|
-  record_size_tombstone_flag, timestamp, key_size = data_blocks.unpack("@#{seek}CQC")
+  record_size_tombstone_flag, timestamp, key_size, value_size = data_blocks.unpack("@#{seek}CQCC")
+
+  seek += 11
 
   record_size = record_size_tombstone_flag >> 1 # pegando os primeiros 7 bits
-
   is_tombstone = record_size_tombstone_flag & 1 # aplicando AND no bit menos significativo
 
-  seek += 10
+  key, value = data_blocks.unpack("@#{seek}a#{key_size}a#{value_size}")
 
-  key, = data_blocks.unpack("@#{seek}a#{key_size}")
-
-  seek += key_size
-
-  value_size, = data_blocks.unpack("@#{seek}C")
-
-  seek += 1
-
-  value,  = data_blocks.unpack("@#{seek}a#{value_size}")
-
-  seek += value_size
+  seek += key_size + value_size
 
   puts "#{index} Record details\n\nTombstone? -> #{is_tombstone == 1}\nKey -> #{key}\nKey Size ->#{key_size}\nValue size-> #{value_size}\nValue ->#{value}\nRecord size -> #{record_size}\n"
 end

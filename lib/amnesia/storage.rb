@@ -64,19 +64,16 @@ module Amnesia
       data_blocks = items.map do |(key, value)|
         is_tombstone = value.empty? ? 1 : 0
 
-        record = [key.bytesize, key, value.bytesize, value].pack("Ca#{key.bytesize}Ca*")
+        record = [key, value].pack("a#{key.bytesize}a*")
 
         # we will use 7 bits for record size and 1 bit for tombostone flag
         # por isso o shift
         # isso nos limita a um registro de no maximo 127bytes, mas parece bom pra gente
         record_size = (record.bytesize << 1) | is_tombstone
 
-        record_metadata = [record_size, created_at_timestamp].pack('CQ')
+        record_metadata = [record_size, created_at_timestamp, key.bytesize, value.bytesize].pack('CQCC')
 
         "#{record_metadata}#{record}"
-
-        # [is_tombstone, created_at_timestamp, key.bytesize, key, value.bytesize,
-        #  value].pack("CQCa#{key.bytesize}Ca*")
       end.join
 
       content = "#{header}#{data_blocks}"
