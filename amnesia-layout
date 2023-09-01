@@ -27,3 +27,14 @@ DATA BLOCK
 ----------------------
 7-bit         1-bit         64-bit        8-bit       x bytes 8-bit      y bytes
 record_size | is_tombstone | created_at | sizeof(v1) | v1 | sizeof(k1) |  k1
+
+mudando para
+
+record_size -> 7-bit
+is_tombstone -> 1-bit
+
+created_at -> 64 bit -> 8 bytes
+sizeof_key -> 8-bit -> 1 byte
+sizeof_value -> 8-bit -> 1 byte
+key -> 8x bits -> x bytes
+value -> 8y bits -> y bytes
