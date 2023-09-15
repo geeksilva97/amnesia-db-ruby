@@ -50,7 +50,7 @@ module Amnesia
 
       pp result
 
-      result
+      result.reject { |(_key, value)| value.nil? || value.empty? }
     end
   end
 end
