@@ -32,7 +32,7 @@ module Amnesia
     end
 
     def get(key, index_entry: nil)
-      return record_from_index(index_entry) unless index_entry.nil?
+      return record_from_index(index_entry, key) unless index_entry.nil?
 
       record_from_scan(key)
     end
@@ -125,12 +125,14 @@ module Amnesia
       parse_record(result)
     end
 
-    def record_from_index(index_entry)
+    def record_from_index(index_entry, key)
       offset, size = index_entry
 
-      record = File.read(filename, size, offset)
+      # puts "Reading from index -> offset: #{offset} / size -> #{size}"
 
-      parse_record(record)
+      value = File.binread(filename, size, offset)
+
+      parse_record("#{key},#{value}\n")
     end
   end
 end

@@ -48,18 +48,26 @@ module Amnesia
     end
 
     def populate_index_structure
-      puts 'no populating the fking index'
-      # lines = File.readlines(@storage.filename)
-      # byte_offset = 0
+      fd = File.open(@storage.filename, 'rb')
 
-      # lines.each do |line|
-      #   record_key, = line.split(',', 2)
-      #   record_size = line.bytesize
+      fd.seek(9, IO::SEEK_CUR) # skipping header
 
-      #   @index_structure.add(record_key, [byte_offset, record_size - 1])
+      until fd.eof?
+        _block_size, _record_size_tombstone, _timestamp, key_size = fd.read(11).unpack('CCQC')
+        record_key = fd.read(key_size)
 
-      #   byte_offset += line.bytesize
-      # end
+        value_size, = fd.read(1).unpack('C')
+
+        puts "Adding index entry\nKey -> #{record_key}\nFile offset -> #{fd.pos}\nValue size -> #{value_size}"
+
+        @index_structure.add(record_key, [fd.pos, value_size])
+
+        fd.seek(value_size, IO::SEEK_CUR)
+      end
+
+      pp @index_structure
+
+      fd.close
     end
   end
 end
