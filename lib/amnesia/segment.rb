@@ -53,7 +53,7 @@ module Amnesia
       fd.seek(9, IO::SEEK_CUR) # skipping header
 
       until fd.eof?
-        _block_size, _record_size_tombstone, _timestamp, key_size = fd.read(11).unpack('CCQC')
+        _block_size, _record_size_tombstone, _timestamp, key_size = fd.read(12).unpack('SCQC')
         record_key = fd.read(key_size)
 
         value_size, = fd.read(1).unpack('C')

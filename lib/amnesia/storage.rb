@@ -2,7 +2,7 @@ module Amnesia
   class Storage
     attr_reader :filename
 
-    FIXED_AMOUNT_OF_BYTE_PER_BLOCK = 12
+    FIXED_AMOUNT_OF_BYTE_PER_BLOCK = 13
 
     def initialize(filename, items: nil)
       @filename = filename
@@ -72,7 +72,7 @@ module Amnesia
 
         row = [block_size, record_size_tombstone_composition, creation_timestamp, key_size, key, value_size, value]
 
-        row.pack("CCQCa#{key_size}Ca#{value_size}")
+        row.pack("SCQCa#{key_size}Ca#{value_size}")
       end.join
 
       File.binwrite(filename, "#{header}#{data_blocks}")
@@ -84,17 +84,16 @@ module Amnesia
       handler = File.open(filename, 'rb')
 
       handler.seek(9, IO::SEEK_CUR) # skipping header
-      # header = handler.read(9).unpack('CQ') # [num of keys, timestamp]
-
-      # puts 'header of the file'
-      # pp header
 
       result = nil
 
       until handler.eof?
-        block_size, record_size_tombstone, _timestamp, key_size = handler.read(11).unpack('CCQC')
+        block_seek = 12
+        block_size, record_size_tombstone, _timestamp, key_size = handler.read(block_seek).unpack('SCQC')
 
         key = handler.read(key_size)
+
+        puts "Key Size -> #{key_size} // Key -> #{key}\n\n"
 
         if searching_key == key
           is_tombstone = record_size_tombstone & 1
@@ -114,9 +113,9 @@ module Amnesia
           break
         else
           # vai para o proximo bloco
-          # offset calculado com base no tamanho do bloco subtraidos dos bytes já lidos, 11 + key - numero de bytes da
+          # offset calculado com base no tamanho do bloco subtraidos dos bytes já lidos, 12 + key - numero de bytes da
           # key
-          handler.seek(block_size - (key_size + 11), IO::SEEK_CUR)
+          handler.seek(block_size - (key_size + block_seek), IO::SEEK_CUR)
         end
       end
 
@@ -127,8 +126,6 @@ module Amnesia
 
     def record_from_index(index_entry, key)
       offset, size = index_entry
-
-      # puts "Reading from index -> offset: #{offset} / size -> #{size}"
 
       value = File.binread(filename, size, offset)
 
