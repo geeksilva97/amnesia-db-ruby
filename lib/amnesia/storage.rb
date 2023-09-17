@@ -2,6 +2,8 @@ module Amnesia
   class Storage
     attr_reader :filename
 
+    FIXED_AMOUNT_OF_BYTE_PER_BLOCK = 12
+
     def initialize(filename, items: nil)
       @filename = filename
       populate_data(items) unless items.nil? || items.empty?
@@ -56,7 +58,6 @@ module Amnesia
     def populate_data(items)
       num_keys = items.length
       creation_timestamp = Time.now.to_i
-      fixed_amount_of_byter_per_block = 12
 
       header = [num_keys, creation_timestamp].pack('CQ')
 
@@ -67,17 +68,14 @@ module Amnesia
         record_size = key_size + value_size
         record_size_tombstone_composition = (record_size << 1) | is_tombstone
 
-        block_size = fixed_amount_of_byter_per_block + record_size
+        block_size = FIXED_AMOUNT_OF_BYTE_PER_BLOCK + record_size
 
         row = [block_size, record_size_tombstone_composition, creation_timestamp, key_size, key, value_size, value]
 
         row.pack("CCQCa#{key_size}Ca#{value_size}")
       end.join
 
-      pp header
-      pp data_blocks
-
-      # data_block = items.map { |(key, value)| "#{key},#{value}\n" }.join('')
+      File.binwrite(filename, "#{header}#{data_blocks}")
 
       # create_db_file(data_block)
     end
