@@ -80,15 +80,49 @@ module Amnesia
       # create_db_file(data_block)
     end
 
-    def record_from_scan(key)
-      lines = File.readlines(filename)
+    def record_from_scan(searching_key)
+      handler = File.open(filename, 'rb')
 
-      record = lines.filter do |line|
-        record_key, = line.split(',', 2)
-        record_key == key
-      end.last
+      handler.seek(9, IO::SEEK_CUR) # skipping header
+      # header = handler.read(9).unpack('CQ') # [num of keys, timestamp]
 
-      parse_record(record)
+      # puts 'header of the file'
+      # pp header
+
+      result = nil
+
+      until handler.eof?
+        block_size, record_size_tombstone, _timestamp, key_size = handler.read(11).unpack('CCQC')
+
+        key = handler.read(key_size)
+
+        if searching_key == key
+          is_tombstone = record_size_tombstone & 1
+
+          # value_size = block_size - (key_size + 11 + 1) # 11 ja lidos pra pegar a key, 1 a menos também que é a informacao value_size em si
+
+          # handler.seek(1, IO::SEEK_CUR)
+
+          value_size, = handler.read(1).unpack('C')
+
+          value, = handler.read(value_size).unpack('a*')
+
+          result = "#{key},#{value}\n" # por questoes de compatiblidade
+
+          result = "#{key},\n" if is_tombstone == 1
+
+          break
+        else
+          # vai para o proximo bloco
+          # offset calculado com base no tamanho do bloco subtraidos dos bytes já lidos, 11 + key - numero de bytes da
+          # key
+          handler.seek(block_size - (key_size + 11), IO::SEEK_CUR)
+        end
+      end
+
+      handler.close
+
+      parse_record(result)
     end
 
     def record_from_index(index_entry)

@@ -48,17 +48,18 @@ module Amnesia
     end
 
     def populate_index_structure
-      lines = File.readlines(@storage.filename)
-      byte_offset = 0
+      puts 'no populating the fking index'
+      # lines = File.readlines(@storage.filename)
+      # byte_offset = 0
 
-      lines.each do |line|
-        record_key, = line.split(',', 2)
-        record_size = line.bytesize
+      # lines.each do |line|
+      #   record_key, = line.split(',', 2)
+      #   record_size = line.bytesize
 
-        @index_structure.add(record_key, [byte_offset, record_size - 1])
+      #   @index_structure.add(record_key, [byte_offset, record_size - 1])
 
-        byte_offset += line.bytesize
-      end
+      #   byte_offset += line.bytesize
+      # end
     end
   end
 end
