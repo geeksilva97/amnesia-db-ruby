@@ -54,9 +54,32 @@ module Amnesia
     private
 
     def populate_data(items)
-      data_block = items.map { |(key, value)| "#{key},#{value}\n" }.join('')
+      num_keys = items.length
+      creation_timestamp = Time.now.to_i
+      fixed_amount_of_byter_per_block = 12
 
-      create_db_file(data_block)
+      header = [num_keys, creation_timestamp].pack('CQ')
+
+      data_blocks = items.map do |(key, value)|
+        is_tombstone = value.empty? ? 1 : 0
+        key_size = key.bytesize
+        value_size = value.bytesize
+        record_size = key_size + value_size
+        record_size_tombstone_composition = (record_size << 1) | is_tombstone
+
+        block_size = fixed_amount_of_byter_per_block + record_size
+
+        row = [block_size, record_size_tombstone_composition, creation_timestamp, key_size, key, value_size, value]
+
+        row.pack("CCQCa#{key_size}Ca#{value_size}")
+      end.join
+
+      pp header
+      pp data_blocks
+
+      # data_block = items.map { |(key, value)| "#{key},#{value}\n" }.join('')
+
+      # create_db_file(data_block)
     end
 
     def record_from_scan(key)
