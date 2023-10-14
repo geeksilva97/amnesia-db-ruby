@@ -2,6 +2,8 @@ module Amnesia
   class Storage
     attr_reader :filename
 
+    FIXED_AMOUNT_OF_BYTE_PER_BLOCK = 13
+
     def initialize(filename, items: nil)
       @filename = filename
       populate_data(items) unless items.nil? || items.empty?
@@ -30,7 +32,7 @@ module Amnesia
     end
 
     def get(key, index_entry: nil)
-      return record_from_index(index_entry) unless index_entry.nil?
+      return record_from_index(index_entry, key) unless index_entry.nil?
 
       record_from_scan(key)
     end
@@ -54,28 +56,80 @@ module Amnesia
     private
 
     def populate_data(items)
-      data_block = items.map { |(key, value)| "#{key},#{value}\n" }.join('')
+      num_keys = items.length
+      creation_timestamp = Time.now.to_i
 
-      create_db_file(data_block)
+      header = [num_keys, creation_timestamp].pack('CQ')
+
+      data_blocks = items.map do |(key, value)|
+        is_tombstone = value.empty? ? 1 : 0
+        key_size = key.bytesize
+        value_size = value.bytesize
+        record_size = key_size + value_size
+        record_size_tombstone_composition = (record_size << 1) | is_tombstone
+
+        block_size = FIXED_AMOUNT_OF_BYTE_PER_BLOCK + record_size
+
+        row = [block_size, record_size_tombstone_composition, creation_timestamp, key_size, key, value_size, value]
+
+        row.pack("SCQCa#{key_size}Ca#{value_size}")
+      end.join
+
+      File.binwrite(filename, "#{header}#{data_blocks}")
+
+      # create_db_file(data_block)
     end
 
-    def record_from_scan(key)
-      lines = File.readlines(filename)
+    def record_from_scan(searching_key)
+      handler = File.open(filename, 'rb')
 
-      record = lines.filter do |line|
-        record_key, = line.split(',', 2)
-        record_key == key
-      end.last
+      handler.seek(9, IO::SEEK_CUR) # skipping header
 
-      parse_record(record)
+      result = nil
+
+      until handler.eof?
+        block_seek = 12
+        block_size, record_size_tombstone, _timestamp, key_size = handler.read(block_seek).unpack('SCQC')
+
+        key = handler.read(key_size)
+
+        puts "Key Size -> #{key_size} // Key -> #{key}\n\n"
+
+        if searching_key == key
+          is_tombstone = record_size_tombstone & 1
+
+          # value_size = block_size - (key_size + 11 + 1) # 11 ja lidos pra pegar a key, 1 a menos também que é a informacao value_size em si
+
+          # handler.seek(1, IO::SEEK_CUR)
+
+          value_size, = handler.read(1).unpack('C')
+
+          value, = handler.read(value_size).unpack('a*')
+
+          result = "#{key},#{value}\n" # por questoes de compatiblidade
+
+          result = "#{key},\n" if is_tombstone == 1
+
+          break
+        else
+          # vai para o proximo bloco
+          # offset calculado com base no tamanho do bloco subtraidos dos bytes já lidos, 12 + key - numero de bytes da
+          # key
+          handler.seek(block_size - (key_size + block_seek), IO::SEEK_CUR)
+        end
+      end
+
+      handler.close
+
+      parse_record(result)
     end
 
-    def record_from_index(index_entry)
+    def record_from_index(index_entry, key)
       offset, size = index_entry
 
-      record = File.read(filename, size, offset)
+      value = File.binread(filename, size, offset)
 
-      parse_record(record)
+      parse_record("#{key},#{value}\n")
     end
   end
 end
